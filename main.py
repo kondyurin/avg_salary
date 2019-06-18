@@ -33,17 +33,26 @@ def get_hh_vacancy():
             'period': 30
         }
         data = fetch_json(url, path)
-        result.append(data)
-    return result
+    lang_salary['lang'] = [i[data] for i in langs]
+    print(lang_salary)
+    return lang_salary
 
 
-def get_avg_salary_hh(hh_vacancies):
-    for lang in hh_vacancies:
-        vacancies_found = lang['found']
-        vacancies_data = lang['items']
-        print(vacancies_found) # 6 step of 17
+def get_salary_info_hh(hh_vacancies):
+    pass
 
 
 if __name__ == "__main__":
     hh_vacancies = get_hh_vacancy()
-    get_avg_salary_hh(hh_vacancies)
+    get_salary_info_hh(hh_vacancies)
+
+# dct = {
+#     'lang': [
+#         'python': {
+
+#         },
+#         'java': {
+
+#         }
+#     ]
+# }
