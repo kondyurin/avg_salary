@@ -33,15 +33,20 @@ def get_hh_vacancy():
             'period': 30
         }
         data = fetch_json(url, path)
-        result.append(data)
-    return result
+        lang_salary[lang] = data
+    return lang_salary
 
 
 def get_avg_salary_hh(hh_vacancies):
-    for lang in hh_vacancies:
-        vacancies_found = lang['found']
-        vacancies_data = lang['items']
-        print(vacancies_found) # 6 step of 17
+    # vacancies_data = hh_vacancies['python']['items']
+    for k,v in hh_vacancies.items():
+        lang_data = v['items']
+        vacancies_found = v['found']
+        for salary in lang_data:
+            avg_salary = predict_rub_salary(salary['salary'])
+            print(avg_salary, vacancies_found)
+    # for vacancy in vacancies_data:
+        # print('{}'.format(predict_rub_salary(vacancy['salary'])))
 
 
 if __name__ == "__main__":
