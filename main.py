@@ -37,18 +37,15 @@ def get_hh_vacancy():
     return lang_salary
 
 
-def get_avg_salary_hh(hh_vacancies):
-    # vacancies_data = hh_vacancies['python']['items']
+def get_salary_info_hh(hh_vacancies):
+    langs_info = dict()
     for k,v in hh_vacancies.items():
-        lang_data = v['items']
-        vacancies_found = v['found']
-        for salary in lang_data:
-            avg_salary = predict_rub_salary(salary['salary'])
-            print(avg_salary, vacancies_found)
-    # for vacancy in vacancies_data:
-        # print('{}'.format(predict_rub_salary(vacancy['salary'])))
+        vacancies_count = v['found']
+        vacancies_data = v['items']
+        for vacancy in vacancies_data:
+            avg_salary = predict_rub_salary(vacancy['salary']))
 
 
 if __name__ == "__main__":
     hh_vacancies = get_hh_vacancy()
-    get_avg_salary_hh(hh_vacancies)
+    get_salary_info_hh(hh_vacancies)
