@@ -1,4 +1,5 @@
 import requests
+from itertools import count
 from statistics import mean
 
 
@@ -32,64 +33,47 @@ def get_vacancies_processed(vacancy_salaries):
     return len(new)
 
 
-def get_hh_vacancy_data(langs):
-    fin = dict()
-    for lang in langs:
+def get_hh_vacancy_data(lang):
+    data_result = []
+    for page in count():
         url = "https://api.hh.ru/vacancies"
         path = {
             'text': 'программист {}'.format(lang),
             'area': 1,
-            'period': 30
+            'period': 30,
+            'page': page
         }
         data = fetch_json(url, path)
-        salaries = []
-        for vacancy in data['items']:
+        data_result.append(data)
+        if page >= data['pages']:
+            break
+    return data_result
+
+
+def get_hh_lang_info(hh_vacancy_data):
+    salaries = []
+    for item in hh_vacancy_data:
+        for vacancy in item['items']:
             salaries.append(predict_rub_salary(vacancy['salary']))
-            mean_salary = get_mean_salary(salaries)
-            vacancy_salaries = get_vacancies_processed(salaries)
-        fin.update({lang: {"vacancies_count":data['found'], "vacancies_processed": vacancy_salaries,"average_salary": mean_salary}})
-    return fin
-
-
-# def get_hh_lang_info(hh_vacancy_data):
-#     vacancies_count = hh_vacancy_data['found']
-#     lang_info = {
-#         lang: {
-#             'vacancies_found': vacancies_count, 
-#             'vacancies_processed':'', 
-#             'average_salary':''
-#         }
-#     }
-#     return lang_info
+    vacancies_count = item['found']
+    mean_salary = get_mean_salary(salaries)
+    vacancy_salaries = get_vacancies_processed(salaries)
+    return vacancies_count, mean_salary, vacancy_salaries
 
 
 if __name__ == "__main__":
-
+    lang_info = dict()
     langs = ['python', 'java']
-    # for lang in langs:
-    #     hh_vacancies = get_hh_vacancy_data(lang)
-    #     res = get_hh_lang_info(hh_vacancies)
-    #     print(res)
-    res = get_hh_vacancy_data(langs)
-    print(res)
-        
-
-
-
-# {
-#     "Python": { 
-#         "vacancies_found": 1068,
-#         "vacancies_processed": 13,
-#         "average_salary": 123853
-#     },
-#     "Java": {
-#         "vacancies_found": 1592,
-#         "vacancies_processed": 16,
-#         "average_salary": 121456
-#     },
-#     "Javascript": { 
-#         "vacancies_found": 3696,
-#         "vacancies_processed": 18,
-#         "average_salary": 140173
-#     }
-# }
+    for lang in langs:
+        vacancy_data = get_hh_vacancy_data(lang)
+        vacancies_count, mean_salary, vacancy_salaries = get_hh_lang_info(vacancy_data)
+        lang_info.update(
+            {
+                lang: {
+                    "vacancies_count": vacancies_count, 
+                    "vacancies_processed": vacancy_salaries,
+                    "average_salary": mean_salary
+                }
+            }
+        )
+    print(lang_info)
